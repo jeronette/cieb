@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Inmobiliario - Gestión de Urbanizaciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 30px;
+            color: #4a5568;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Main App Styles */
+        .main-app {
+            display: none;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: scale(1.05);
+        }
+
+        /* Urbanizations Grid */
+        .urbanizations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .urbanization {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .urbanization:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .urbanization h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .lot {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .lot.available {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .lot.sold {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+        }
+
+        .lot.reserved {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+
+        .lot:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .lot-number {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .lot-status {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-header h3 {
+            color: #2d3748;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #a0aec0;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #e53e3e;
+        }
+
+        .client-info {
+            display: grid;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .info-value {
+            color: #2d3748;
+        }
+
+        /* Search Results */
+        .search-results {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .result-item:hover {
+            background: #f7fafc;
+            transform: translateX(10px);
+        }
+
+        .result-name {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .result-details {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* Legend */
+        .legend {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        .legend-color.available {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .legend-color.sold {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+
+        .legend-color.reserved {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .urbanizations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2>🏘️ Sistema Inmobiliario</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="userType">Tipo de Usuario:</label>
+                    <select id="userType" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="admin">Administrador</option>
+                        <option value="user">Usuario</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" required placeholder="Ingrese su usuario">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" required placeholder="Ingrese su contraseña">
+                </div>
+                <button type="submit" class="btn">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app">
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-content">
+                    <div class="logo">🏘️ Sistema Inmobiliario</div>
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar comprador...">
+                        <button id="searchBtn" class="search-btn">🔍</button>
+                    </div>
+                    <div class="user-info">
+                        <span id="userWelcome"></span>
+                        <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div id="searchResults" class="search-results"></div>
+
+            <!-- Urbanizations Grid -->
+            <div class="urbanizations-grid" id="urbanizationsGrid"></div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>Disponible</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color reserved"></div>
+                    <span>Reservado</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color sold"></div>
+                    <span>Vendido</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lot Details Modal -->
+    <div id="lotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalles del Lote</h3>
+                <button class="close-btn" onclick="closeLotModal()">×</button>
+            </div>
+            <div class="client-info" id="clientInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const users = {
+            admin: { username: 'admin', password: 'admin123', type: 'admin', name: 'Administrador' },
+            user1: { username: 'usuario', password: 'user123', type: 'user', name: 'Usuario Demo' }
+        };
+
+        const urbanizations = [
+            { id: 1, name: 'Villa Esperanza', totalLots: 24 },
+            { id: 2, name: 'Residencial Los Pinos', totalLots: 20 },
+            { id: 3, name: 'Conjunto Primavera', totalLots: 16 },
+            { id: 4, name: 'Urbanización El Bosque', totalLots: 28 },
+            { id: 5, name: 'Villa Real', totalLots: 18 },
+            { id: 6, name: 'Residencial Aurora', totalLots: 22 }
+        ];
+
+        const clients = [
+            { id: 1, name: 'Juan Carlos Pérez', phone: '591-70123456', email: 'juan.perez@email.com', urbanization: 1, lot: 5, status: 'sold', purchaseDate: '15/03/2024', price: '$25,000' },
+            { id: 2, name: 'María Elena García', phone: '591-70234567', email: 'maria.garcia@email.com', urbanization: 1, lot: 12, status: 'sold', purchaseDate: '22/03/2024', price: '$28,000' },
+            { id: 3, name: 'Roberto Silva López', phone: '591-70345678', email: 'roberto.silva@email.com', urbanization: 2, lot: 8, status: 'reserved', purchaseDate: '10/04/2024', price: '$30,000' },
+            { id: 4, name: 'Ana Sofía Mendoza', phone: '591-70456789', email: 'ana.mendoza@email.com', urbanization: 2, lot: 15, status: 'sold', purchaseDate: '18/04/2024', price: '$32,000' },
+            { id: 5, name: 'Luis Fernando Rojas', phone: '591-70567890', email: 'luis.rojas@email.com', urbanization: 3, lot: 7, status: 'reserved', purchaseDate: '25/04/2024', price: '$27,000' },
+            { id: 6, name: 'Carmen Rosa Vargas', phone: '591-70678901', email: 'carmen.vargas@email.com', urbanization: 4, lot: 13, status: 'sold', purchaseDate: '02/05/2024', price: '$35,000' },
+            { id: 7, name: 'Diego Alejandro Cruz', phone: '591-70789012', email: 'diego.cruz@email.com', urbanization: 5, lot: 9, status: 'reserved', purchaseDate: '15/05/2024', price: '$29,000' },
+            { id: 8, name: 'Valeria Isabel Torres', phone: '591-70890123', email: 'valeria.torres@email.com', urbanization: 6, lot: 11, status: 'sold', purchaseDate: '20/05/2024', price: '$33,000' },
+            { id: 9, name: 'Fernando José Morales', phone: '591-70901234', email: 'fernando.morales@email.com', urbanization: 1, lot: 18, status: 'reserved', purchaseDate: '28/05/2024', price: '$26,000' },
+            { id: 10, name: 'Gabriela Patricia Luna', phone: '591-71012345', email: 'gabriela.luna@email.com', urbanization: 3, lot: 14, status: 'sold', purchaseDate: '05/06/2024', price: '$31,000' }
+        ];
+
+        let currentUser = null;
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userType = document.getElementById('userType').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const user = Object.values(users).find(u => 
+                u.username === username && u.password === password && u.type === userType
+            );
+            
+            if (user) {
+                currentUser = user;
+                showMainApp();
+            } else {
+                alert('Credenciales incorrectas. Intente nuevamente.');
+            }
+        });
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userWelcome').textContent = `Bienvenido, ${currentUser.name}`;
+            loadUrbanizations();
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            currentUser = null;
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+        });
+
+        // Load urbanizations
+        function loadUrbanizations() {
+            const grid = document.getElementById('urbanizationsGrid');
+            grid.innerHTML = '';
+            
+            urbanizations.forEach(urbanization => {
+                const urbanDiv = document.createElement('div');
+                urbanDiv.className = 'urbanization';
+                urbanDiv.innerHTML = `
+                    <h3>${urbanization.name}</h3>
+                    <div class="lots-grid" id="lots-${urbanization.id}"></div>
+                `;
+                grid.appendChild(urbanDiv);
+                
+                loadLots(urbanization.id, urbanization.totalLots);
+            });
+        }
+
+        // Load lots for each urbanization
+        function loadLots(urbanizationId, totalLots) {
+            const lotsContainer = document.getElementById(`lots-${urbanizationId}`);
+            
+            for (let i = 1; i <= totalLots; i++) {
+                const client = clients.find(c => c.urbanization === urbanizationId && c.lot === i);
+                const lotDiv = document.createElement('div');
+                
+                if (client) {
+                    lotDiv.className = `lot ${client.status}`;
+                    lotDiv.innerHTML = `
+                        <div class="lot-number">L${i}</div>
+                        <div class="lot-status">${client.status === 'sold' ? 'Vendido' : 'Reservado'}</div>
+                    `;
+                } else {
+                    lotDiv.className = 'lot available';
+                    lotDiv.innerHTML = `
+                        <div class="lot-number">L${i}</div>
+                        <div class="lot-status">Disponible</div>
+                    `;
+                }
+                
+                lotDiv.addEventListener('click', () => showLotDetails(urbanizationId, i, client));
+                lotsContainer.appendChild(lotDiv);
+            }
+        }
+
+        // Show lot details modal
+        function showLotDetails(urbanizationId, lotNumber, client) {
+            const urbanization = urbanizations.find(u => u.id === urbanizationId);
+            const modal = document.getElementById('lotModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const clientInfo = document.getElementById('clientInfo');
+            
+            modalTitle.textContent = `${urbanization.name} - Lote ${lotNumber}`;
+            
+            if (client) {
+                clientInfo.innerHTML = `
+                    <div class="info-row">
+                        <span class="info-label">Cliente:</span>
+                        <span class="info-value">${client.name}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">${client.phone}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">${client.email}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Estado:</span>
+                        <span class="info-value">${client.status === 'sold' ? 'Vendido' : 'Reservado'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Fecha:</span>
+                        <span class="info-value">${client.purchaseDate}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Precio:</span>
+                        <span class="info-value">${client.price}</span>
+                    </div>
+                `;
+            } else {
+                clientInfo.innerHTML = `
+                    <div class="info-row">
+                        <span class="info-label">Estado:</span>
+                        <span class="info-value">Disponible</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Precio Base:</span>
+                        <span class="info-value">$25,000</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Área:</span>
+                        <span class="info-value">200 m²</span>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeLotModal() {
+            document.getElementById('lotModal').style.display = 'none';
+        }
+
+        // Search functionality
+        document.getElementById('searchBtn').addEventListener('click', performSearch);
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                searchResults.classList.remove('active');
+                return;
+            }
+            
+            const results = clients.filter(client => 
+                client.name.toLowerCase().includes(searchTerm) ||
+                client.phone.includes(searchTerm) ||
+                client.email.toLowerCase().includes(searchTerm)
+            );
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p style="text-align: center; color: #718096;">No se encontraron resultados</p>';
+            } else {
+                searchResults.innerHTML = results.map(client => {
+                    const urbanization = urbanizations.find(u => u.id === client.urbanization);
+                    return `
+                        <div class="result-item" onclick="showClientDetails(${client.id})">
+                            <div class="result-name">${client.name}</div>
+                            <div class="result-details">
+                                ${urbanization.name} - Lote ${client.lot} | ${client.phone} | ${client.status === 'sold' ? 'Vendido' : 'Reservado'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            searchResults.classList.add('active');
+        }
+
+        function showClientDetails(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                showLotDetails(client.urbanization, client.lot, client);
+                document.getElementById('searchResults').classList.remove('active');
+                document.getElementById('searchInput').value = '';
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('lotModal');
+            if (e.target === modal) {
+                closeLotModal();
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchContainer = e.target.closest('.search-container');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchContainer && !e.target.closest('.search-results')) {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
